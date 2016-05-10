@@ -51,8 +51,7 @@ Note that from a probabilistic viewpoint, GCO works in log-space.
 Note that all input arrays are assumed to be in int32.
 This means that float potentials must be rounded!
 
-These algorithms can only deal with certain energies. Unfortunately
-I have not figured out yet how to convert C++ errors to Python. If an unknown
+These algorithms can only deal with certain energies. If an 
 error is raised, it probably means that you used an invalid energy function.
 Look at the gco README for details.
 

@@ -1,27 +1,42 @@
 import numpy as np
 cimport numpy as np
 
+
 np.import_array()
+
+# we use the mechanism described in http://stackoverflow.com/questions/10684983/handling-custom-c-exceptions-in-cython to translate graph-cut c++ exceptions into python exceptions that will allow the user to see the message detailing the graph cut exception. 
+from python_object cimport PyObject
+class GCError(RuntimeError):
+	"""
+	This class represents a graph cut error (exception)
+	"""
+	pass
+
+# make the GCError class accessible to c++, so that the c++ function handle_gco_exception can use it
+cdef public PyObject* gcerror = <PyObject*>GCError
+
+cdef extern from "gco_exception_handler.hpp":
+	cdef void handle_gco_exception()
 
 cdef extern from "GCoptimization.h":
     cdef cppclass GCoptimizationGridGraph:
-        GCoptimizationGridGraph(int width, int height, int n_labels) except +
-        void setDataCost(int *) except +
-        void setSmoothCost(int *) except +
-        void expansion(int n_iterations) except +
-        void swap(int n_iterations) except +
-        void setSmoothCostVH(int* pairwise, int* V, int* H) except +
-        int whatLabel(int node) except +
+        GCoptimizationGridGraph(int width, int height, int n_labels) except +handle_gco_exception
+        void setDataCost(int *) except +handle_gco_exception
+        void setSmoothCost(int *) except +handle_gco_exception
+        void expansion(int n_iterations) except +handle_gco_exception
+        void swap(int n_iterations) except +handle_gco_exception
+        void setSmoothCostVH(int* pairwise, int* V, int* H) except +handle_gco_exception
+        int whatLabel(int node) except +handle_gco_exception
 
     cdef cppclass GCoptimizationGeneralGraph:
-        GCoptimizationGeneralGraph(int n_vertices, int n_labels) except +
-        void setDataCost(int *) except +
-        void setSmoothCost(int *) except +
-        void setNeighbors(int, int) except +
-        void setNeighbors(int, int, int) except +
-        void expansion(int n_iterations) except +
-        void swap(int n_iterations) except +
-        int whatLabel(int node) except +
+        GCoptimizationGeneralGraph(int n_vertices, int n_labels) except +handle_gco_exception
+        void setDataCost(int *) except +handle_gco_exception
+        void setSmoothCost(int *) except +handle_gco_exception
+        void setNeighbors(int, int) except +handle_gco_exception
+        void setNeighbors(int, int, int) except +handle_gco_exception
+        void expansion(int n_iterations) except +handle_gco_exception
+        void swap(int n_iterations) except +handle_gco_exception
+        int whatLabel(int node) except +handle_gco_exception
 
 
 def cut_simple(np.ndarray[np.int32_t, ndim=3, mode='c'] unary_cost,

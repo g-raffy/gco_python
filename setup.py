@@ -10,6 +10,7 @@ files = ['GCoptimization.cpp', 'graph.cpp', 'LinkedBlockList.cpp',
          'maxflow.cpp']
 
 files = [os.path.join(gco_directory, f) for f in files]
+files.insert(0, "gco_exception_handler.cpp")
 files.insert(0, "gco_python.pyx")
 
 setup(cmdclass={'build_ext': build_ext},
